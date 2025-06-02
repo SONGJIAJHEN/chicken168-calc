@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>代購費用計算</title>
+  <link href="https://fonts.googleapis.com/css?family=Noto+Sans+TC:400,700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Noto Sans TC', Arial, sans-serif;
+      background: #f4f6fa;
+      margin: 0;
+      padding: 0;
+      color: #222;
+    }
+    .container {
+      max-width: 420px;
+      margin: 48px auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      padding: 32px 28px 24px 28px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 18px;
+      color: #1a237e;
+      letter-spacing: 2px;
+    }
+    label {
+      display: block;
+      margin-top: 18px;
+      font-weight: 700;
+      color: #283593;
+    }
+    input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border: 1px solid #b0bec5;
+      border-radius: 6px;
+      font-size: 1rem;
+      box-sizing: border-box;
+      background: #f9fafc;
+      transition: border 0.2s;
+    }
+    input[type="number"]:focus {
+      border: 1.5px solid #3949ab;
+      outline: none;
+    }
+    .result {
+      margin-top: 28px;
+      background: #e8eaf6;
+      border-radius: 8px;
+      padding: 18px 16px 10px 16px;
+      font-size: 1.08rem;
+      color: #222;
+      box-shadow: 0 2px 8px rgba(26,35,126,0.04);
+    }
+    .result strong {
+      color: #1a237e;
+    }
+    .total {
+      font-size: 1.3rem;
+      color: #d32f2f;
+      font-weight: bold;
+      margin-top: 10px;
+      text-align: right;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 32px;
+      color: #888;
+      font-size: 0.95rem;
+    }
+    .tab-btn {
+      background: #e3e7f7;
+      color: #1a237e;
+      border: none;
+      border-radius: 6px 6px 0 0;
+      padding: 8px 24px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .tab-btn.active {
+      background: #1a237e;
+      color: #fff;
+    }
+    @media (max-width: 500px) {
+      .container {
+        padding: 18px 6vw 16px 6vw;
+      }
+      h1 {
+        font-size: 1.3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>代購費用計算</h1>
+    <div style="text-align:center;margin-bottom:18px;">
+      <button id="remitBtn" class="tab-btn" style="margin-right:8px;">匯款</button>
+      <button id="nocardBtn" class="tab-btn">無卡</button>
+    </div>
+    <div id="remitPanel">
+      <label for="rmb">人民幣金額 (¥)：</label>
+      <input type="number" id="rmb" min="0" step="0.01" placeholder="請輸入人民幣金額">
+
+      <label for="count">購買幾件商品/連結：</label>
+      <input type="number" id="count" min="1" step="1" placeholder="請輸入連結數">
+
+      <label for="weight">包裹重量 (KG)：</label>
+      <input type="number" id="weight" min="0" step="0.01" placeholder="請輸入重量 (KG)">
+
+      <div class="result" id="result">
+        請輸入金額與重量
+      </div>
+    </div>
+    <div id="nocardPanel" style="display:none;">
+      <label for="rmb2">人民幣金額 (¥)：</label>
+      <input type="number" id="rmb2" min="0" step="0.01" placeholder="請輸入人民幣金額">
+
+      <label for="count2">購買幾件商品/連結：</label>
+      <input type="number" id="count2" min="1" step="1" placeholder="請輸入連結數">
+
+      <label for="weight2">包裹重量 (KG)：</label>
+      <input type="number" id="weight2" min="0" step="0.01" placeholder="請輸入重量 (KG)">
+
+      <div class="result" id="result2">
+        請輸入金額與重量
+      </div>
+    </div>
+  </div>
+  <div class="footer">
+    炸雞代購部代購費用計算 | 僅供參考
+  </div>
+  <script>
+    // 匯款/無卡切換
+    const remitBtn = document.getElementById('remitBtn');
+    const nocardBtn = document.getElementById('nocardBtn');
+    const remitPanel = document.getElementById('remitPanel');
+    const nocardPanel = document.getElementById('nocardPanel');
+    remitBtn.classList.add('active');
+    remitBtn.onclick = function() {
+      remitPanel.style.display = '';
+      nocardPanel.style.display = 'none';
+      remitBtn.classList.add('active');
+      nocardBtn.classList.remove('active');
+    };
+    nocardBtn.onclick = function() {
+      remitPanel.style.display = 'none';
+      nocardPanel.style.display = '';
+      remitBtn.classList.remove('active');
+      nocardBtn.classList.add('active');
+    };
+
+    // 匯款計算
+    const rmbInput = document.getElementById('rmb');
+    const countInput = document.getElementById('count');
+    const weightInput = document.getElementById('weight');
+    const resultDiv = document.getElementById('result');
+    // 無卡計算
+    const rmbInput2 = document.getElementById('rmb2');
+    const countInput2 = document.getElementById('count2');
+    const weightInput2 = document.getElementById('weight2');
+    const resultDiv2 = document.getElementById('result2');
+
+    function ceil(val) {
+      return Math.ceil(val);
+    }
+
+    function calc(rmbInput, countInput, weightInput, resultDiv, mode) {
+      let rmb = parseFloat(rmbInput.value);
+      const count = parseInt(countInput.value);
+      const weight = parseFloat(weightInput.value);
+      if (isNaN(rmb) || isNaN(weight) || isNaN(count) || count < 1) {
+        resultDiv.innerHTML = '請輸入金額、連結數與重量';
+        return;
+      }
+      rmb = ceil(rmb); // 金額無條件進位
+      // 1. 代購費
+      let fee = 0, feeDetail = '';
+      const linkFee = count * 20;
+      if (rmb <= 200) {
+        fee = Math.ceil(rmb * 4.65 + linkFee); // 代購費用無條件進位
+        feeDetail = `人民幣≤200：<strong>¥${rmb}</strong> × 4.65 + 連結費 <strong>${linkFee}元</strong> = <strong>${fee}元</strong>`;
+      } else {
+        fee = Math.ceil((rmb * 1.05) * 4.7 + linkFee); // 代購費用無條件進位
+        feeDetail = `人民幣>200：((<strong>¥${rmb}</strong> × 1.05) × 4.7) + 連結費 <strong>${linkFee}元</strong> = <strong>${fee}元</strong>`;
+      }
+      // 2. 國際運費
+      let intlFee = 0, intlDetail = '';
+      if (weight < 1) {
+        if (weight <= 0.5 && weight > 0) {
+          intlFee = 30;
+          intlDetail = `國際運費：0~0.5KG收 <strong>30元</strong>`;
+        } else if (weight > 0.5) {
+          intlFee = 60;
+          intlDetail = `國際運費：0.5~1KG收 <strong>60元</strong>`;
+        } else {
+          intlFee = 0;
+          intlDetail = `國際運費：<strong>0元</strong>`;
+        }
+      } else {
+        intlFee = ceil(weight) * 60;
+        intlDetail = `國際運費：<strong>${ceil(weight)}KG × 60 = ${intlFee}元</strong>`;
+      }
+      // 3. 賣貨便
+      const sellFee = 38;
+      // 4. 總計（不含賣貨便）
+      const total = fee + intlFee;
+      let extra = '';
+      if (mode === 'remit') {
+        // 匯款：匯款金額=總金額-20元，取貨付款20元+賣貨便
+        const remitAmount = total - 20;
+        extra = `<div style=\"margin-top:8px;text-align:right;color:#1565c0;font-weight:bold;\">匯款金額：<span>${remitAmount}元</span></div>
+        <div style=\"text-align:right;color:#d32f2f;font-weight:bold;\">取貨付款：<span>${20 + sellFee}元</span></div>`;
+      } else if (mode === 'nocard') {
+        // 無卡：匯款金額=下修至百元整數，取貨付款=剩餘零頭+賣貨便
+        const remitAmount = Math.floor(total / 100) * 100;
+        const pickupAmount = (total - remitAmount + sellFee).toFixed(2);
+        extra = `<div style=\"margin-top:8px;text-align:right;color:#1565c0;font-weight:bold;\">匯款金額：<span>${remitAmount}元</span></div>
+        <div style=\"text-align:right;color:#d32f2f;font-weight:bold;\">取貨付款：<span>${pickupAmount}元</span></div>`;
+      }
+      resultDiv.innerHTML = `
+        <div>代購費：${feeDetail}</div>
+        <div>${intlDetail}</div>
+        <div>賣貨便：<strong>${sellFee}元</strong></div>
+        <div class=\"total\">總計（不含賣貨便）：<span>${total}元</span></div>
+        ${extra}
+      `;
+    }
+    rmbInput.addEventListener('input', () => calc(rmbInput, countInput, weightInput, resultDiv, 'remit'));
+    countInput.addEventListener('input', () => calc(rmbInput, countInput, weightInput, resultDiv, 'remit'));
+    weightInput.addEventListener('input', () => calc(rmbInput, countInput, weightInput, resultDiv, 'remit'));
+    rmbInput2.addEventListener('input', () => calc(rmbInput2, countInput2, weightInput2, resultDiv2, 'nocard'));
+    countInput2.addEventListener('input', () => calc(rmbInput2, countInput2, weightInput2, resultDiv2, 'nocard'));
+    weightInput2.addEventListener('input', () => calc(rmbInput2, countInput2, weightInput2, resultDiv2, 'nocard'));
+  </script>
+</body>
+</html> 
