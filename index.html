@@ -3,95 +3,137 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>代購費用計算</title>
+  <title>炸雞代購部｜代購計算&貨物查詢</title>
   <link href="https://fonts.googleapis.com/css?family=Noto+Sans+TC:400,700&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Noto Sans TC', Arial, sans-serif;
-      background: #f4f6fa;
+      background: linear-gradient(135deg, #f8fafc 0%, #e3f2fd 100%);
       margin: 0;
       padding: 0;
-      color: #222;
+      color: #263238;
     }
     .container {
-      max-width: 420px;
-      margin: 48px auto;
+      max-width: 440px;
+      margin: 60px auto 0 auto;
       background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-      padding: 32px 28px 24px 28px;
+      border-radius: 18px;
+      box-shadow: 0 6px 32px rgba(33,150,243,0.10);
+      padding: 36px 30px 28px 30px;
+      border: 1.5px solid #e3e7f7;
     }
     h1 {
       text-align: center;
-      font-size: 2rem;
-      margin-bottom: 18px;
-      color: #1a237e;
+      font-size: 2.1rem;
+      margin-bottom: 22px;
+      color: #1976d2;
       letter-spacing: 2px;
-    }
-    label {
-      display: block;
-      margin-top: 18px;
       font-weight: 700;
-      color: #283593;
     }
-    input[type="number"] {
-      width: 100%;
-      padding: 10px;
-      margin-top: 6px;
-      border: 1px solid #b0bec5;
-      border-radius: 6px;
-      font-size: 1rem;
-      box-sizing: border-box;
-      background: #f9fafc;
-      transition: border 0.2s;
-    }
-    input[type="number"]:focus {
-      border: 1.5px solid #3949ab;
-      outline: none;
-    }
-    .result {
-      margin-top: 28px;
-      background: #e8eaf6;
-      border-radius: 8px;
-      padding: 18px 16px 10px 16px;
-      font-size: 1.08rem;
-      color: #222;
-      box-shadow: 0 2px 8px rgba(26,35,126,0.04);
-    }
-    .result strong {
-      color: #1a237e;
-    }
-    .total {
-      font-size: 1.3rem;
-      color: #d32f2f;
-      font-weight: bold;
-      margin-top: 10px;
-      text-align: right;
-    }
-    .footer {
+    .tab-bar {
       text-align: center;
-      margin-top: 32px;
-      color: #888;
-      font-size: 0.95rem;
+      margin-bottom: 24px;
     }
     .tab-btn {
       background: #e3e7f7;
       color: #1a237e;
       border: none;
-      border-radius: 6px 6px 0 0;
-      padding: 8px 24px;
-      font-size: 1rem;
+      border-radius: 8px 8px 0 0;
+      padding: 10px 32px;
+      font-size: 1.08rem;
       font-weight: bold;
       cursor: pointer;
+      margin-right: 8px;
       transition: background 0.2s, color 0.2s;
+      letter-spacing: 1px;
     }
+    .tab-btn:last-child { margin-right: 0; }
     .tab-btn.active {
-      background: #1a237e;
+      background: #1976d2;
       color: #fff;
+    }
+    label {
+      display: block;
+      margin-top: 18px;
+      font-weight: 700;
+      color: #1976d2;
+      font-size: 1.08rem;
+    }
+    input[type="number"], input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      border: 1.5px solid #90caf9;
+      border-radius: 8px;
+      font-size: 1.08rem;
+      box-sizing: border-box;
+      background: #f5fafd;
+      transition: border 0.2s;
+    }
+    input[type="number"]:focus, input[type="text"]:focus {
+      border: 2px solid #1976d2;
+      outline: none;
+    }
+    .result {
+      margin-top: 32px;
+      background: #e3f2fd;
+      border-radius: 10px;
+      padding: 22px 18px 16px 18px;
+      font-size: 1.12rem;
+      color: #263238;
+      box-shadow: 0 2px 12px rgba(33,150,243,0.06);
+      min-height: 40px;
+    }
+    .result strong {
+      color: #1976d2;
+    }
+    .goods-list {
+      margin: 10px 0 10px 0;
+    }
+    .goods-item {
+      margin-bottom: 10px;
+      padding: 8px 0 8px 0;
+      border-bottom: 1px dashed #90caf9;
+      font-size: 1.08rem;
+    }
+    .goods-item:last-child {
+      border-bottom: none;
+    }
+    .unpaid {
+      color: #d32f2f;
+      font-weight: bold;
+      font-size: 1.15rem;
+    }
+    button, .tab-btn {
+      font-family: 'Noto Sans TC', Arial, sans-serif;
+    }
+    .main-btn {
+      margin-top: 18px;
+      padding: 10px 28px;
+      border-radius: 8px;
+      background: linear-gradient(90deg, #1976d2 60%, #64b5f6 100%);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: 1.08rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+      box-shadow: 0 2px 8px rgba(33,150,243,0.08);
+      transition: background 0.2s;
+    }
+    .main-btn:hover {
+      background: linear-gradient(90deg, #1565c0 60%, #42a5f5 100%);
+    }
+    .footer {
+      text-align: center;
+      margin-top: 38px;
+      color: #888;
+      font-size: 1.05rem;
+      letter-spacing: 1px;
     }
     @media (max-width: 500px) {
       .container {
-        padding: 18px 6vw 16px 6vw;
+        padding: 18px 4vw 16px 4vw;
       }
       h1 {
         font-size: 1.3rem;
@@ -101,98 +143,89 @@
 </head>
 <body>
   <div class="container">
-    <h1>代購費用計算</h1>
-    <div style="text-align:center;margin-bottom:18px;">
-      <button id="remitBtn" class="tab-btn" style="margin-right:8px;">匯款</button>
-      <button id="nocardBtn" class="tab-btn">無卡</button>
+    <h1 id="mainTitle">炸雞代購部</h1>
+    <div class="tab-bar">
+      <button id="tabCalc" class="tab-btn active">代購費用計算</button>
+      <button id="tabQuery" class="tab-btn">貨物查詢</button>
     </div>
-    <div id="remitPanel">
+    <div id="panelCalc">
+      <div style="margin-bottom:16px;">
+        <label style="font-weight:700;color:#1976d2;">付款方式：</label>
+        <label style="margin-right:18px;"><input type="radio" name="payType" value="remit" checked> 匯款</label>
+        <label><input type="radio" name="payType" value="nocard"> 無卡</label>
+      </div>
       <label for="rmb">人民幣金額 (¥)：</label>
       <input type="number" id="rmb" min="0" step="0.01" placeholder="請輸入人民幣金額">
-
       <label for="count">購買幾件商品/連結：</label>
       <input type="number" id="count" min="1" step="1" placeholder="請輸入連結數">
-
       <label for="weight">包裹重量 (KG)：</label>
       <input type="number" id="weight" min="0" step="0.01" placeholder="請輸入重量 (KG)">
-
-      <div class="result" id="result">
-        請輸入金額與重量
-      </div>
+      <div class="result" id="resultCalc">請輸入金額與重量</div>
     </div>
-    <div id="nocardPanel" style="display:none;">
-      <label for="rmb2">人民幣金額 (¥)：</label>
-      <input type="number" id="rmb2" min="0" step="0.01" placeholder="請輸入人民幣金額">
-
-      <label for="count2">購買幾件商品/連結：</label>
-      <input type="number" id="count2" min="1" step="1" placeholder="請輸入連結數">
-
-      <label for="weight2">包裹重量 (KG)：</label>
-      <input type="number" id="weight2" min="0" step="0.01" placeholder="請輸入重量 (KG)">
-
-      <div class="result" id="result2">
-        請輸入金額與重量
-      </div>
+    <div id="panelQuery" style="display:none;">
+      <label for="lineName">請輸入LINE名稱：</label>
+      <input type="text" id="lineName" placeholder="LINE名稱">
+      <button id="queryBtn" class="main-btn">查詢</button>
+      <div id="resultQuery" class="result" style="display:none;"></div>
     </div>
   </div>
   <div class="footer">
-    炸雞代購部代購費用計算 | 僅供參考
+    炸雞代購部 | 代購計算&貨物查詢 | 僅供參考
   </div>
   <script>
-    // 匯款/無卡切換
-    const remitBtn = document.getElementById('remitBtn');
-    const nocardBtn = document.getElementById('nocardBtn');
-    const remitPanel = document.getElementById('remitPanel');
-    const nocardPanel = document.getElementById('nocardPanel');
-    remitBtn.classList.add('active');
-    remitBtn.onclick = function() {
-      remitPanel.style.display = '';
-      nocardPanel.style.display = 'none';
-      remitBtn.classList.add('active');
-      nocardBtn.classList.remove('active');
+    // 分頁切換
+    const tabCalc = document.getElementById('tabCalc');
+    const tabQuery = document.getElementById('tabQuery');
+    const panelCalc = document.getElementById('panelCalc');
+    const panelQuery = document.getElementById('panelQuery');
+    const mainTitle = document.getElementById('mainTitle');
+    tabCalc.onclick = function() {
+      tabCalc.classList.add('active');
+      tabQuery.classList.remove('active');
+      panelCalc.style.display = '';
+      panelQuery.style.display = 'none';
+      mainTitle.textContent = '炸雞代購部';
     };
-    nocardBtn.onclick = function() {
-      remitPanel.style.display = 'none';
-      nocardPanel.style.display = '';
-      remitBtn.classList.remove('active');
-      nocardBtn.classList.add('active');
+    tabQuery.onclick = function() {
+      tabCalc.classList.remove('active');
+      tabQuery.classList.add('active');
+      panelCalc.style.display = 'none';
+      panelQuery.style.display = '';
+      mainTitle.textContent = '貨物查詢';
     };
 
-    // 匯款計算
+    // 代購費用計算
     const rmbInput = document.getElementById('rmb');
     const countInput = document.getElementById('count');
     const weightInput = document.getElementById('weight');
-    const resultDiv = document.getElementById('result');
-    // 無卡計算
-    const rmbInput2 = document.getElementById('rmb2');
-    const countInput2 = document.getElementById('count2');
-    const weightInput2 = document.getElementById('weight2');
-    const resultDiv2 = document.getElementById('result2');
-
-    function ceil(val) {
-      return Math.ceil(val);
-    }
-
-    function calc(rmbInput, countInput, weightInput, resultDiv, mode) {
+    const resultCalc = document.getElementById('resultCalc');
+    const payTypeInputs = document.getElementsByName('payType');
+    let payType = 'remit';
+    payTypeInputs.forEach(input => {
+      input.addEventListener('change', function() {
+        payType = this.value;
+        calc();
+      });
+    });
+    function ceil(val) { return Math.ceil(val); }
+    function calc() {
       let rmb = parseFloat(rmbInput.value);
       const count = parseInt(countInput.value);
       const weight = parseFloat(weightInput.value);
       if (isNaN(rmb) || isNaN(weight) || isNaN(count) || count < 1) {
-        resultDiv.innerHTML = '請輸入金額、連結數與重量';
+        resultCalc.innerHTML = '請輸入金額、連結數與重量';
         return;
       }
-      rmb = ceil(rmb); // 金額無條件進位
-      // 1. 代購費
+      rmb = ceil(rmb);
       let fee = 0, feeDetail = '';
       const linkFee = count * 20;
       if (rmb <= 200) {
-        fee = Math.ceil(rmb * 4.65 + linkFee); // 代購費用無條件進位
+        fee = Math.ceil(rmb * 4.65 + linkFee);
         feeDetail = `人民幣≤200：<strong>¥${rmb}</strong> × 4.65 + 連結費 <strong>${linkFee}元</strong> = <strong>${fee}元</strong>`;
       } else {
-        fee = Math.ceil((rmb * 1.05) * 4.7 + linkFee); // 代購費用無條件進位
+        fee = Math.ceil((rmb * 1.05) * 4.7 + linkFee);
         feeDetail = `人民幣>200：((<strong>¥${rmb}</strong> × 1.05) × 4.7) + 連結費 <strong>${linkFee}元</strong> = <strong>${fee}元</strong>`;
       }
-      // 2. 國際運費
       let intlFee = 0, intlDetail = '';
       if (weight < 1) {
         if (weight <= 0.5 && weight > 0) {
@@ -209,37 +242,77 @@
         intlFee = ceil(weight) * 60;
         intlDetail = `國際運費：<strong>${ceil(weight)}KG × 60 = ${intlFee}元</strong>`;
       }
-      // 3. 賣貨便
       const sellFee = 38;
-      // 4. 總計（不含賣貨便）
       const total = fee + intlFee;
-      let extra = '';
-      if (mode === 'remit') {
-        // 匯款：匯款金額=總金額-20元，取貨付款20元+賣貨便
+      let detail = '';
+      if (payType === 'remit') {
         const remitAmount = total - 20;
-        extra = `<div style=\"margin-top:8px;text-align:right;color:#1565c0;font-weight:bold;\">匯款金額：<span>${remitAmount}元</span></div>
-        <div style=\"text-align:right;color:#d32f2f;font-weight:bold;\">取貨付款：<span>${20 + sellFee}元</span></div>`;
-      } else if (mode === 'nocard') {
-        // 無卡：匯款金額=下修至百元整數，取貨付款=剩餘零頭+賣貨便
-        const remitAmount = Math.floor(total / 100) * 100;
-        const pickupAmount = (total - remitAmount + sellFee).toFixed(2);
-        extra = `<div style=\"margin-top:8px;text-align:right;color:#1565c0;font-weight:bold;\">匯款金額：<span>${remitAmount}元</span></div>
-        <div style=\"text-align:right;color:#d32f2f;font-weight:bold;\">取貨付款：<span>${pickupAmount}元</span></div>`;
+        detail = `<div style="margin-top:8px;text-align:right;color:#1565c0;font-weight:bold;">匯款金額：<span>${remitAmount}元</span></div>
+          <div style="text-align:right;color:#d32f2f;font-weight:bold;">取貨付款：<span>${20 + sellFee}元</span></div>`;
+      } else {
+        const nocardRemit = Math.floor(total / 100) * 100;
+        const nocardPickup = (total - nocardRemit + sellFee).toFixed(2);
+        detail = `<div style="margin-top:8px;text-align:right;color:#1565c0;font-weight:bold;">匯款金額：<span>${nocardRemit}元</span></div>
+          <div style="text-align:right;color:#d32f2f;font-weight:bold;">取貨付款：<span>${nocardPickup}元</span></div>`;
       }
-      resultDiv.innerHTML = `
+      resultCalc.innerHTML = `
         <div>代購費：${feeDetail}</div>
         <div>${intlDetail}</div>
         <div>賣貨便：<strong>${sellFee}元</strong></div>
-        <div class=\"total\">總計（不含賣貨便）：<span>${total}元</span></div>
-        ${extra}
+        <div class="total">總計（不含賣貨便）：<span>${total}元</span></div>
+        ${detail}
       `;
     }
-    rmbInput.addEventListener('input', () => calc(rmbInput, countInput, weightInput, resultDiv, 'remit'));
-    countInput.addEventListener('input', () => calc(rmbInput, countInput, weightInput, resultDiv, 'remit'));
-    weightInput.addEventListener('input', () => calc(rmbInput, countInput, weightInput, resultDiv, 'remit'));
-    rmbInput2.addEventListener('input', () => calc(rmbInput2, countInput2, weightInput2, resultDiv2, 'nocard'));
-    countInput2.addEventListener('input', () => calc(rmbInput2, countInput2, weightInput2, resultDiv2, 'nocard'));
-    weightInput2.addEventListener('input', () => calc(rmbInput2, countInput2, weightInput2, resultDiv2, 'nocard'));
+    rmbInput.addEventListener('input', calc);
+    countInput.addEventListener('input', calc);
+    weightInput.addEventListener('input', calc);
+
+    // 貨物查詢
+    const SHEET_ID = '1CVqHtN6LQB2_zJ3y0w6DRatZGGzFIF6v1Dtfvhs-1KY';
+    const SHEET_NAME = '工作表1';
+    const API_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
+    document.getElementById('queryBtn').onclick = async function() {
+      const name = document.getElementById('lineName').value.trim();
+      const resultDiv = document.getElementById('resultQuery');
+      if (!name) {
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = '請輸入LINE名稱';
+        return;
+      }
+      resultDiv.style.display = 'block';
+      resultDiv.innerHTML = '查詢中...';
+      try {
+        const res = await fetch(API_URL);
+        const text = await res.text();
+        const json = JSON.parse(text.substr(47).slice(0, -2));
+        const table = json.table;
+        const rows = table.rows;
+        const header = table.cols.map(col => col.label);
+        const idxLine = header.indexOf('LINE名稱');
+        const idxGoods = header.indexOf('商品名稱');
+        const idxStatus = header.indexOf('貨物狀態');
+        const idxUnpaid = header.indexOf('未繳金額');
+        const userRows = rows.filter(row => row.c[idxLine] && row.c[idxLine].v && row.c[idxLine].v.trim() === name);
+        if (userRows.length === 0) {
+          resultDiv.innerHTML = '查無資料，請確認輸入正確';
+          return;
+        }
+        let html = '<div class="goods-list">';
+        let unpaidTotal = 0;
+        userRows.forEach(row => {
+          const goods = row.c[idxGoods] ? row.c[idxGoods].v : '';
+          const status = row.c[idxStatus] ? row.c[idxStatus].v : '';
+          const unpaid = row.c[idxUnpaid] ? Number(row.c[idxUnpaid].v) : 0;
+          html += `<div class="goods-item">商品：<strong>${goods}</strong>｜狀態：<strong>${status}</strong></div>`;
+          unpaidTotal += unpaid;
+        });
+        html += '</div>';
+        html += `<div style="margin-top:10px;">未繳金額：<span class="unpaid">${unpaidTotal} 元</span></div>`;
+        resultDiv.innerHTML = html;
+      } catch (e) {
+        resultDiv.innerHTML = '查詢失敗，請稍後再試';
+      }
+    };
   </script>
 </body>
 </html> 
