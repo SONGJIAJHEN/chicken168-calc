@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>炸雞代購部｜代購計算&貨物查詢</title>
+  <title>炸雞代購部｜多功能查詢系統</title>
   <link href="https://fonts.googleapis.com/css?family=Noto+Sans+TC:400,700&display=swap" rel="stylesheet">
   <style>
     body {
@@ -33,19 +33,23 @@
     .tab-bar {
       text-align: center;
       margin-bottom: 24px;
+      display: flex;
+      justify-content: center;
     }
     .tab-btn {
       background: #e3e7f7;
       color: #1a237e;
       border: none;
       border-radius: 8px 8px 0 0;
-      padding: 10px 32px;
-      font-size: 1.08rem;
+      padding: 10px 20px;
+      font-size: 1rem;
       font-weight: bold;
       cursor: pointer;
-      margin-right: 8px;
+      margin-right: 4px;
       transition: background 0.2s, color 0.2s;
       letter-spacing: 1px;
+      flex: 1;
+      max-width: 120px;
     }
     .tab-btn:last-child { margin-right: 0; }
     .tab-btn.active {
@@ -131,12 +135,58 @@
       font-size: 1.05rem;
       letter-spacing: 1px;
     }
+    .member-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .member-table th {
+      background: #1976d2;
+      color: white;
+      padding: 12px 8px;
+      text-align: center;
+      font-size: 0.9rem;
+      font-weight: bold;
+    }
+    .member-table td {
+      padding: 10px 8px;
+      text-align: center;
+      border-bottom: 1px solid #e0e0e0;
+      font-size: 0.85rem;
+    }
+    .member-table tr:nth-child(even) {
+      background: #f5f5f5;
+    }
+    .member-table tr:last-child td {
+      border-bottom: none;
+    }
+    .member-level {
+      font-weight: bold;
+      color: #1976d2;
+    }
+    .basic-member {
+      color: #4caf50;
+    }
+    .stable-member {
+      color: #ff9800;
+    }
+    .vip-member {
+      color: #e91e63;
+    }
     @media (max-width: 500px) {
       .container {
         padding: 18px 4vw 16px 4vw;
       }
       h1 {
         font-size: 1.3rem;
+      }
+      .tab-btn {
+        padding: 8px 20px;
+        font-size: 1rem;
       }
     }
   </style>
@@ -147,7 +197,10 @@
     <div class="tab-bar">
       <button id="tabCalc" class="tab-btn active">代購費用計算</button>
       <button id="tabQuery" class="tab-btn">貨物查詢</button>
+      <button id="tabMember" class="tab-btn">會員查詢</button>
     </div>
+    
+    <!-- 代購費用計算分頁 -->
     <div id="panelCalc">
       <div style="margin-bottom:16px;">
         <label style="font-weight:700;color:#1976d2;">付款方式：</label>
@@ -162,36 +215,98 @@
       <input type="number" id="weight" min="0" step="0.01" placeholder="請輸入重量 (KG)">
       <div class="result" id="resultCalc">請輸入金額與重量</div>
     </div>
+    
+    <!-- 貨物查詢分頁 -->
     <div id="panelQuery" style="display:none;">
       <label for="lineName">請輸入LINE名稱：</label>
       <input type="text" id="lineName" placeholder="LINE名稱">
       <button id="queryBtn" class="main-btn">查詢</button>
       <div id="resultQuery" class="result" style="display:none;"></div>
     </div>
+    
+    <!-- 會員查詢分頁 -->
+    <div id="panelMember" style="display:none;">
+      <label for="memberName">請輸入LINE名稱：</label>
+      <input type="text" id="memberName" placeholder="LINE名稱">
+      <button onclick="queryMember()" class="main-btn">查詢會員等級</button>
+      <div id="resultMember" class="result" style="display:none;"></div>
+      
+      <h3 style="text-align: center; margin-top: 30px; color: #1976d2; font-size: 1.2rem;">會員等級說明</h3>
+      <table class="member-table">
+        <thead>
+          <tr>
+            <th>會員等級</th>
+            <th>月下單</th>
+            <th>月消費金額</th>
+            <th>專屬優惠</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="member-level basic-member">基礎會員</td>
+            <td>每月≥3單</td>
+            <td>無門檻</td>
+            <td>每單國際運費-NT$5</td>
+          </tr>
+          <tr>
+            <td class="member-level stable-member">穩定會員</td>
+            <td>每月≥5單</td>
+            <td>≥NT$8000</td>
+            <td>每單國際運費-NT$10</td>
+          </tr>
+          <tr>
+            <td class="member-level vip-member">VIP會員</td>
+            <td>每月≥8單</td>
+            <td>≥NT$15000</td>
+            <td>代購服務費9折+每月免一次國際運費</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
+  
   <div class="footer">
-    炸雞代購部 | 代購計算&貨物查詢 | 僅供參考
+    炸雞代購部 | 多功能查詢系統 | 僅供參考
   </div>
+
   <script>
     // 分頁切換
     const tabCalc = document.getElementById('tabCalc');
     const tabQuery = document.getElementById('tabQuery');
+    const tabMember = document.getElementById('tabMember');
     const panelCalc = document.getElementById('panelCalc');
     const panelQuery = document.getElementById('panelQuery');
+    const panelMember = document.getElementById('panelMember');
     const mainTitle = document.getElementById('mainTitle');
+    
     tabCalc.onclick = function() {
       tabCalc.classList.add('active');
       tabQuery.classList.remove('active');
+      tabMember.classList.remove('active');
       panelCalc.style.display = '';
       panelQuery.style.display = 'none';
+      panelMember.style.display = 'none';
       mainTitle.textContent = '炸雞代購部';
     };
+    
     tabQuery.onclick = function() {
       tabCalc.classList.remove('active');
       tabQuery.classList.add('active');
+      tabMember.classList.remove('active');
       panelCalc.style.display = 'none';
       panelQuery.style.display = '';
-      mainTitle.textContent = '貨物查詢';
+      panelMember.style.display = 'none';
+      mainTitle.textContent = '炸雞代購部';
+    };
+    
+    tabMember.onclick = function() {
+      tabCalc.classList.remove('active');
+      tabQuery.classList.remove('active');
+      tabMember.classList.add('active');
+      panelCalc.style.display = 'none';
+      panelQuery.style.display = 'none';
+      panelMember.style.display = '';
+      mainTitle.textContent = '炸雞代購部';
     };
 
     // 代購費用計算
@@ -201,24 +316,30 @@
     const resultCalc = document.getElementById('resultCalc');
     const payTypeInputs = document.getElementsByName('payType');
     let payType = 'remit';
+    
     payTypeInputs.forEach(input => {
       input.addEventListener('change', function() {
         payType = this.value;
         calc();
       });
     });
+    
     function ceil(val) { return Math.ceil(val); }
+    
     function calc() {
       let rmb = parseFloat(rmbInput.value);
       const count = parseInt(countInput.value);
       const weight = parseFloat(weightInput.value);
+      
       if (isNaN(rmb) || isNaN(weight) || isNaN(count) || count < 1) {
         resultCalc.innerHTML = '請輸入金額、連結數與重量';
         return;
       }
+      
       rmb = ceil(rmb);
       let fee = 0, feeDetail = '';
-      const linkFee = count * 40;
+      const linkFee = count * 40; // 連結費用改為40元
+      
       if (rmb <= 200) {
         fee = Math.ceil(rmb * 4.65 + linkFee);
         feeDetail = `人民幣≤200：<strong>¥${rmb}</strong> × 4.65 + 連結費 <strong>${linkFee}元</strong> = <strong>${fee}元</strong>`;
@@ -226,43 +347,51 @@
         fee = Math.ceil((rmb * 1.05) * 4.7 + linkFee);
         feeDetail = `人民幣>200：((<strong>¥${rmb}</strong> × 1.05) × 4.7) + 連結費 <strong>${linkFee}元</strong> = <strong>${fee}元</strong>`;
       }
+      
       let intlFee = 0, intlDetail = '';
-      if (weight < 1) {
-        if (weight <= 0.5 && weight > 0) {
-          intlFee = 30;
-          intlDetail = `國際運費：0~0.5KG收 <strong>30元</strong>`;
-        } else if (weight > 0.5) {
-          intlFee = 60;
-          intlDetail = `國際運費：0.5~1KG收 <strong>60元</strong>`;
-        } else {
-          intlFee = 0;
-          intlDetail = `國際運費：<strong>0元</strong>`;
-        }
+      if (weight <= 0) {
+        intlFee = 0;
+        intlDetail = `國際運費：<strong>0元</strong>`;
+      } else if (weight <= 0.3) {
+        intlFee = 30;
+        intlDetail = `國際運費：≤0.3KG收 <strong>30元</strong>`;
       } else {
         intlFee = ceil(weight) * 60;
         intlDetail = `國際運費：<strong>${ceil(weight)}KG × 60 = ${intlFee}元</strong>`;
       }
-      const sellFee = 38;
+      
       const total = fee + intlFee;
-      let detail = '';
-      if (payType === 'remit') {
-        const remitAmount = total - 20;
-        detail = `<div style="margin-top:8px;text-align:right;color:#1565c0;font-weight:bold;">匯款金額：<span>${remitAmount}元</span></div>
-          <div style="text-align:right;color:#d32f2f;font-weight:bold;">取貨付款：<span>${20 + sellFee}元</span></div>`;
+      const remitAmount = total - 20; // 匯款金額 = 總金額扣除20元
+      
+      // 計算無卡金額和二補金額
+      const nocardAmount = Math.floor(total / 100) * 100; // 無卡金額為100的倍數（向下取整）
+      const supplementAmount = total - nocardAmount; // 二補金額
+      
+      let paymentDisplay = '';
+      if (payType === 'nocard') {
+        paymentDisplay = `
+          <div style="margin-top: 15px; text-align: right;">
+            <div style="color: #1976d2; font-weight: bold;">無卡金額：${nocardAmount}元</div>
+            <div style="color: #d32f2f; font-weight: bold;">二補金額：${supplementAmount}元</div>
+          </div>
+        `;
       } else {
-        const nocardRemit = Math.floor(total / 100) * 100;
-        const nocardPickup = (total - nocardRemit + sellFee).toFixed(2);
-        detail = `<div style="margin-top:8px;text-align:right;color:#1565c0;font-weight:bold;">匯款金額：<span>${nocardRemit}元</span></div>
-          <div style="text-align:right;color:#d32f2f;font-weight:bold;">取貨付款：<span>${nocardPickup}元</span></div>`;
+        paymentDisplay = `
+          <div style="margin-top: 15px; text-align: right;">
+            <div style="color: #1976d2; font-weight: bold;">匯款金額：${remitAmount}元</div>
+            <div style="color: #666; font-size: 0.9rem; margin-top: 5px;">匯款會先扣除20元補在二補</div>
+          </div>
+        `;
       }
+      
       resultCalc.innerHTML = `
         <div>代購費：${feeDetail}</div>
         <div>${intlDetail}</div>
-        <div>賣貨便：<strong>${sellFee}元</strong></div>
-        <div class="total">總計（不含賣貨便）：<span>${total}元</span></div>
-        ${detail}
+        <div class="total">總計：<span>${total}元</span></div>
+        ${paymentDisplay}
       `;
     }
+    
     rmbInput.addEventListener('input', calc);
     countInput.addEventListener('input', calc);
     weightInput.addEventListener('input', calc);
@@ -271,49 +400,229 @@
     const SHEET_ID = '1CVqHtN6LQB2_zJ3y0w6DRatZGGzFIF6v1Dtfvhs-1KY';
     const SHEET_NAME = '工作表1';
     const API_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
+    
     document.getElementById('queryBtn').onclick = async function() {
       const name = document.getElementById('lineName').value.trim();
       const resultDiv = document.getElementById('resultQuery');
+      
       if (!name) {
         resultDiv.style.display = 'block';
         resultDiv.innerHTML = '請輸入LINE名稱';
         return;
       }
+      
       resultDiv.style.display = 'block';
       resultDiv.innerHTML = '查詢中...';
+      
       try {
         const res = await fetch(API_URL);
         const text = await res.text();
         const json = JSON.parse(text.substr(47).slice(0, -2));
         const table = json.table;
         const rows = table.rows;
+        
         const header = table.cols.map(col => col.label);
         const idxLine = header.indexOf('LINE名稱');
         const idxGoods = header.indexOf('商品名稱');
         const idxStatus = header.indexOf('貨物狀態');
         const idxUnpaid = header.indexOf('未繳金額');
+        
         const userRows = rows.filter(row => row.c[idxLine] && row.c[idxLine].v && row.c[idxLine].v.trim() === name);
+        
         if (userRows.length === 0) {
           resultDiv.innerHTML = '查無資料，請確認輸入正確';
           return;
         }
+        
         let html = '<div class="goods-list">';
         let unpaidTotal = 0;
+        let unpaidText = '';
         userRows.forEach(row => {
           const goods = row.c[idxGoods] ? row.c[idxGoods].v : '';
           const status = row.c[idxStatus] ? row.c[idxStatus].v : '';
-          const unpaid = row.c[idxUnpaid] ? Number(row.c[idxUnpaid].v) : 0;
+          const unpaid = row.c[idxUnpaid] ? row.c[idxUnpaid].v : '';
+          
+          // 檢查未繳金額是否為數字
+          const unpaidNum = parseFloat(unpaid);
+          if (!isNaN(unpaidNum)) {
+            unpaidTotal += unpaidNum;
+          } else {
+            // 如果不是數字，直接顯示文字
+            unpaidText = unpaid;
+          }
+          
           html += `<div class="goods-item">商品：<strong>${goods}</strong>｜狀態：<strong>${status}</strong></div>`;
-          unpaidTotal += unpaid;
         });
         html += '</div>';
-        html += `<div style="margin-top:10px;">未繳金額：<span class="unpaid">${unpaidTotal} 元</span></div>`;
+        
+        if (unpaidText) {
+          html += `<div style="margin-top:10px;">未繳金額：<span class="unpaid">${unpaidText}</span></div>`;
+        } else {
+          html += `<div style="margin-top:10px;">未繳金額：<span class="unpaid">${unpaidTotal} 元</span></div>`;
+        }
         resultDiv.innerHTML = html;
       } catch (e) {
         resultDiv.innerHTML = '查詢失敗，請稍後再試';
       }
     };
+
+    // 會員等級查詢
+    async function queryMember() {
+      const name = document.getElementById('memberName').value.trim();
+      const resultDiv = document.getElementById('resultMember');
+      
+      if (!name) {
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = '請輸入姓名';
+        return;
+      }
+
+      resultDiv.style.display = 'block';
+      resultDiv.innerHTML = '查詢中...';
+
+      try {
+        const res = await fetch(API_URL);
+        const text = await res.text();
+        const json = JSON.parse(text.substr(47).slice(0, -2));
+        const table = json.table;
+        const rows = table.rows;
+
+        const header = table.cols.map(col => col.label);
+        const idxName = header.indexOf('LINE名稱'); // 使用LINE名稱欄位
+        const idxLevel = 8; // I欄位是會員等級 (索引8)
+        const idxDiscount = 9; // J欄位是優惠 (索引9)
+        const idxAmount = 10; // K欄位是月累積金額 (索引10)
+        const idxOrders = 11; // L欄位是月累積單數 (索引11)
+        const idxFirstOrder = 12; // M欄位是第一單幾號 (索引12)
+
+        if (idxName === -1) {
+          resultDiv.innerHTML = '試算表中找不到「LINE名稱」欄位，請確認欄位名稱正確';
+          return;
+        }
+
+        const memberRow = rows.find(row => 
+          row.c[idxName] && row.c[idxName].v && row.c[idxName].v.trim() === name
+        );
+
+        if (!memberRow) {
+          resultDiv.innerHTML = '查無此會員資料，請確認輸入正確';
+          return;
+        }
+
+        const memberLevel = memberRow.c[idxLevel] ? memberRow.c[idxLevel].v : '';
+        const discount = memberRow.c[idxDiscount] ? memberRow.c[idxDiscount].v : '';
+        const monthlyAmount = memberRow.c[idxAmount] ? memberRow.c[idxAmount].v : '0';
+        const monthlyOrders = memberRow.c[idxOrders] ? memberRow.c[idxOrders].v : '0';
+        const firstOrder = memberRow.c[idxFirstOrder] ? memberRow.c[idxFirstOrder].v : '';
+
+        let actualLevel = memberLevel;
+        if (memberLevel === '基礎會員' || memberLevel === '') {
+          const orders = parseInt(monthlyOrders) || 0;
+          const amount = parseInt(monthlyAmount) || 0;
+          
+          if (orders >= 8 && amount >= 15000) {
+            actualLevel = 'VIP會員';
+          } else if (orders >= 5 && amount >= 8000) {
+            actualLevel = '穩定會員';
+          } else if (orders >= 3) {
+            actualLevel = '基礎會員';
+          } else {
+            actualLevel = '一般客戶';
+          }
+        }
+
+        let levelClass = '';
+        let levelStyle = '';
+        switch(actualLevel) {
+          case '基礎會員':
+            levelClass = 'basic-member';
+            levelStyle = 'color: #d32f2f; font-weight: bold;';
+            break;
+          case '穩定會員':
+            levelClass = 'stable-member';
+            levelStyle = 'color: #d32f2f; font-weight: bold;';
+            break;
+          case 'VIP會員':
+            levelClass = 'vip-member';
+            levelStyle = 'color: #d32f2f; font-weight: bold;';
+            break;
+          default:
+            levelClass = '';
+            levelStyle = '';
+        }
+
+        // 處理會員等級顯示
+        let displayLevel = '';
+        switch(actualLevel) {
+          case '基礎會員':
+            displayLevel = '基礎';
+            break;
+          case '穩定會員':
+            displayLevel = '穩定';
+            break;
+          case 'VIP會員':
+            displayLevel = 'VIP';
+            break;
+          default:
+            displayLevel = actualLevel;
+        }
+
+        // 處理時間格式 - 顯示月日範圍
+        let timeDisplay = '';
+        if (firstOrder) {
+          console.log('M欄位原始資料:', firstOrder); // 調試用
+          // 處理 Date(2025,7,11) 格式
+          const dateMatch = firstOrder.match(/Date\((\d+),(\d+),(\d+)\)/);
+                     if (dateMatch) {
+             const year = parseInt(dateMatch[1]);
+             const monthZero = parseInt(dateMatch[2]);
+             const day = parseInt(dateMatch[3]);
+             const month = monthZero + 1;
+             const endMonth = month === 12 ? 1 : month + 1;
+            timeDisplay = `${month}/${day}-${endMonth}/${day}`;
+            console.log('Date格式解析:', `${month}/${day}-${endMonth}/${day}`); // 調試用
+          } else {
+            // 處理 8/11 格式
+            const dateMatch2 = firstOrder.match(/(\d+)\/(\d+)/);
+            if (dateMatch2) {
+              const month = parseInt(dateMatch2[1]);
+              const day = parseInt(dateMatch2[2]);
+              const endMonth = month + 1;
+              timeDisplay = `${month}/${day}-${endMonth}/${day}`;
+              console.log('月日格式解析:', `${month}/${day}-${endMonth}/${day}`); // 調試用
+            } else {
+              timeDisplay = firstOrder;
+              console.log('無法解析格式，直接顯示:', firstOrder); // 調試用
+            }
+          }
+        }
+
+        resultDiv.innerHTML = `
+          <div><strong>${name}</strong> 的會員資料：</div>
+          <div style="margin-top: 10px;">會員等級：<span style="color: #d32f2f; font-weight: bold; font-size: 1.2rem;">${displayLevel}</span></div>
+          <div>目前月累積幾單：${monthlyOrders} 單</div>
+          <div>目前月累積金額：NT$ ${parseInt(monthlyAmount).toLocaleString()}</div>
+          ${discount ? `<div>優惠：${discount}</div>` : ''}
+          ${timeDisplay ? `<div>時間：${timeDisplay}</div>` : ''}
+        `;
+      } catch (e) {
+        resultDiv.innerHTML = '查詢失敗，請稍後再試';
+        console.error('Error:', e);
+      }
+    };
+
+    // 按Enter鍵查詢
+    document.getElementById('lineName').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        document.getElementById('queryBtn').click();
+      }
+    });
+
+    document.getElementById('memberName').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        queryMember();
+      }
+    });
   </script>
 </body>
 </html> 
-
