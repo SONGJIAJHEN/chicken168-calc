@@ -422,10 +422,10 @@
         const rows = table.rows;
         
         const header = table.cols.map(col => col.label);
-        const idxLine = header.indexOf('LINE名稱');
-        const idxGoods = header.indexOf('商品名稱');
-        const idxStatus = header.indexOf('貨物狀態');
-        const idxUnpaid = header.indexOf('未繳金額');
+                 const idxLine = header.indexOf('LINE名稱');
+         const idxGoods = header.indexOf('商品名稱');
+         const idxStatus = header.indexOf('貨物狀態');
+         const idxUnpaid = 3; // D欄位（索引3）：未繳金額
         
         const userRows = rows.filter(row => row.c[idxLine] && row.c[idxLine].v && row.c[idxLine].v.trim() === name);
         
@@ -434,33 +434,52 @@
           return;
         }
         
-        let html = '<div class="goods-list">';
-        let unpaidTotal = 0;
-        let unpaidText = '';
-        userRows.forEach(row => {
-          const goods = row.c[idxGoods] ? row.c[idxGoods].v : '';
-          const status = row.c[idxStatus] ? row.c[idxStatus].v : '';
-          const unpaid = row.c[idxUnpaid] ? row.c[idxUnpaid].v : '';
+                 let html = '<div class="goods-list">';
+         let unpaidTotal = 0;
+         let unpaidNotes = [];
+         userRows.forEach(row => {
+           const goods = row.c[idxGoods] ? row.c[idxGoods].v : '';
+           const status = row.c[idxStatus] ? row.c[idxStatus].v : '';
+           const unpaid = row.c[idxUnpaid] ? row.c[idxUnpaid].v : '';
           
-          // 檢查未繳金額是否為數字
-          const unpaidNum = parseFloat(unpaid);
-          if (!isNaN(unpaidNum)) {
-            unpaidTotal += unpaidNum;
-          } else {
-            // 如果不是數字，直接顯示文字
-            unpaidText = unpaid;
+          // 解析「數字+中文」混合（例如：20+國際運 或 國際運+20 或 20元+國際運）
+          if (unpaid !== null && unpaid !== undefined && unpaid !== '') {
+            if (typeof unpaid === 'number') {
+              unpaidTotal += unpaid;
+            } else {
+              const parts = String(unpaid).split(/[+＋]/);
+              parts.forEach(part => {
+                const token = part.trim();
+                if (!token) return;
+                const numericCandidate = token.replace(/[,\s]|元|NT\$/g, '');
+                const num = parseFloat(numericCandidate);
+                if (!isNaN(num) && /\d/.test(numericCandidate)) {
+                  unpaidTotal += num;
+                } else {
+                  unpaidNotes.push(token);
+                }
+              });
+            }
           }
-          
-          html += `<div class="goods-item">商品：<strong>${goods}</strong>｜狀態：<strong>${status}</strong></div>`;
-        });
-        html += '</div>';
-        
-        if (unpaidText) {
-          html += `<div style="margin-top:10px;">未繳金額：<span class="unpaid">${unpaidText}</span></div>`;
-        } else {
-          html += `<div style="margin-top:10px;">未繳金額：<span class="unpaid">${unpaidTotal} 元</span></div>`;
-        }
-        resultDiv.innerHTML = html;
+           
+           html += `<div class="goods-item">商品：<strong>${goods}</strong>｜狀態：<strong>${status}</strong></div>`;
+         });
+         html += '</div>';
+         
+         // 合併顯示：數字合計 + 文字備註（如：20元+國際運）
+         let unpaidDisplay = '';
+         if (unpaidTotal > 0 && unpaidNotes.length > 0) {
+           unpaidDisplay = `${unpaidTotal}元+${unpaidNotes.join('+')}`;
+         } else if (unpaidTotal > 0) {
+           unpaidDisplay = `${unpaidTotal} 元`;
+         } else if (unpaidNotes.length > 0) {
+           unpaidDisplay = unpaidNotes.join('+');
+         } else {
+           unpaidDisplay = '0 元';
+         }
+         html += `<div style="margin-top:10px;">未繳金額：<span class="unpaid">${unpaidDisplay}</span></div>`;
+         
+         resultDiv.innerHTML = html;
       } catch (e) {
         resultDiv.innerHTML = '查詢失敗，請稍後再試';
       }
