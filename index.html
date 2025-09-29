@@ -341,11 +341,11 @@
       const linkFee = count * 40; // 連結費用改為40元
       
       if (rmb <= 200) {
-        fee = Math.ceil(rmb * 4.65 + linkFee);
-        feeDetail = `人民幣≤200：<strong>¥${rmb}</strong> × 4.65 + 連結費 <strong>${linkFee}元</strong> = <strong>${fee}元</strong>`;
+        fee = Math.ceil(rmb * 4.7 + linkFee);
+        feeDetail = `人民幣≤200：<strong>¥${rmb}</strong> × 4.7 + 連結費 <strong>${linkFee}元</strong> = <strong>${fee}元</strong>`;
       } else {
-        fee = Math.ceil((rmb * 1.05) * 4.7 + linkFee);
-        feeDetail = `人民幣>200：((<strong>¥${rmb}</strong> × 1.05) × 4.7) + 連結費 <strong>${linkFee}元</strong> = <strong>${fee}元</strong>`;
+        fee = Math.ceil((rmb * 1.05) * 4.75 + linkFee);
+        feeDetail = `人民幣>200：((<strong>¥${rmb}</strong> × 1.05) × 4.75) + 連結費 <strong>${linkFee}元</strong> = <strong>${fee}元</strong>`;
       }
       
       let intlFee = 0, intlDetail = '';
@@ -353,11 +353,11 @@
         intlFee = 0;
         intlDetail = `國際運費：<strong>0元</strong>`;
       } else if (weight <= 0.3) {
-        intlFee = 30;
-        intlDetail = `國際運費：≤0.3KG收 <strong>30元</strong>`;
+        intlFee = 40;
+        intlDetail = `國際運費：≤0.3KG收 <strong>40元</strong>`;
       } else {
-        intlFee = ceil(weight) * 60;
-        intlDetail = `國際運費：<strong>${ceil(weight)}KG × 60 = ${intlFee}元</strong>`;
+        intlFee = ceil(weight) * 70;
+        intlDetail = `國際運費：<strong>${ceil(weight)}KG × 70 = ${intlFee}元</strong>`;
       }
       
       const total = fee + intlFee;
@@ -645,3 +645,4 @@
   </script>
 </body>
 </html> 
+
