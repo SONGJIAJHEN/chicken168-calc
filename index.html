@@ -421,65 +421,79 @@
         const table = json.table;
         const rows = table.rows;
         
-        const header = table.cols.map(col => col.label);
-                 const idxLine = header.indexOf('LINE名稱');
-         const idxGoods = header.indexOf('商品名稱');
-         const idxStatus = header.indexOf('貨物狀態');
-         const idxUnpaid = 3; // D欄位（索引3）：未繳金額
-        
-        const userRows = rows.filter(row => row.c[idxLine] && row.c[idxLine].v && row.c[idxLine].v.trim() === name);
-        
+        // 使用固定欄位索引：A 名稱(0), B 商品名稱(1), C 貨物狀態(2), D 未繳金額(3), M 時間(12)
+        const idxName = 0, idxGoods = 1, idxStatus = 2, idxUnpaid = 3, idxTime = 12;
+
+        const userRows = rows.filter(row => row.c[idxName] && row.c[idxName].v && String(row.c[idxName].v).trim() === name);
         if (userRows.length === 0) {
           resultDiv.innerHTML = '查無資料，請確認輸入正確';
           return;
         }
-        
-                 let html = '<div class="goods-list">';
-         let unpaidTotal = 0;
-         let unpaidNotes = [];
-         userRows.forEach(row => {
-           const goods = row.c[idxGoods] ? row.c[idxGoods].v : '';
-           const status = row.c[idxStatus] ? row.c[idxStatus].v : '';
-           const unpaid = row.c[idxUnpaid] ? row.c[idxUnpaid].v : '';
-          
-          // 解析「數字+中文」混合（例如：20+國際運 或 國際運+20 或 20元+國際運）
-          if (unpaid !== null && unpaid !== undefined && unpaid !== '') {
-            if (typeof unpaid === 'number') {
-              unpaidTotal += unpaid;
-            } else {
-              const parts = String(unpaid).split(/[+＋]/);
-              parts.forEach(part => {
-                const token = part.trim();
-                if (!token) return;
-                const numericCandidate = token.replace(/[,\s]|元|NT\$/g, '');
-                const num = parseFloat(numericCandidate);
-                if (!isNaN(num) && /\d/.test(numericCandidate)) {
-                  unpaidTotal += num;
-                } else {
-                  unpaidNotes.push(token);
-                }
-              });
-            }
+
+        // 以 M 欄時間取最新一筆
+        const parseTs = (val) => {
+          if (!val) return 0;
+          const s = String(val);
+          const m = s.match(/Date\((\d+),(\d+),(\d+)\)/);
+          if (m) {
+            const y = parseInt(m[1]);
+            const mo = parseInt(m[2]);
+            const d = parseInt(m[3]);
+            return new Date(y, mo, d).getTime();
           }
-           
-           html += `<div class="goods-item">商品：<strong>${goods}</strong>｜狀態：<strong>${status}</strong></div>`;
-         });
-         html += '</div>';
-         
-         // 合併顯示：數字合計 + 文字備註（如：20元+國際運）
-         let unpaidDisplay = '';
-         if (unpaidTotal > 0 && unpaidNotes.length > 0) {
-           unpaidDisplay = `${unpaidTotal}元+${unpaidNotes.join('+')}`;
-         } else if (unpaidTotal > 0) {
-           unpaidDisplay = `${unpaidTotal} 元`;
-         } else if (unpaidNotes.length > 0) {
-           unpaidDisplay = unpaidNotes.join('+');
-         } else {
-           unpaidDisplay = '0 元';
-         }
-         html += `<div style="margin-top:10px;">未繳金額：<span class="unpaid">${unpaidDisplay}</span></div>`;
-         
-         resultDiv.innerHTML = html;
+          const t = new Date(s).getTime();
+          return isNaN(t) ? 0 : t;
+        };
+
+        const latestRow = userRows.reduce((acc, cur) => {
+          const tAcc = acc && acc.c[idxTime] ? parseTs(acc.c[idxTime].v) : 0;
+          const tCur = cur && cur.c[idxTime] ? parseTs(cur.c[idxTime].v) : 0;
+          return tCur >= tAcc ? cur : acc;
+        });
+
+        const goods = latestRow.c[idxGoods] ? latestRow.c[idxGoods].v : '';
+        const status = latestRow.c[idxStatus] ? latestRow.c[idxStatus].v : '';
+        const unpaid = latestRow.c[idxUnpaid] ? latestRow.c[idxUnpaid].v : '';
+
+        let unpaidTotal = 0;
+        let unpaidNotes = [];
+        if (unpaid !== null && unpaid !== undefined && unpaid !== '') {
+          if (typeof unpaid === 'number') {
+            unpaidTotal += unpaid;
+          } else {
+            const parts = String(unpaid).split(/[+＋]/);
+            parts.forEach(part => {
+              const token = part.trim();
+              if (!token) return;
+              const numericCandidate = token.replace(/[\,\s]|元|NT\$/g, '');
+              const num = parseFloat(numericCandidate);
+              if (!isNaN(num) && /\d/.test(numericCandidate)) {
+                unpaidTotal += num;
+              } else {
+                unpaidNotes.push(token);
+              }
+            });
+          }
+        }
+
+        let unpaidDisplay = '';
+        if (unpaidTotal > 0 && unpaidNotes.length > 0) {
+          unpaidDisplay = `${unpaidTotal}元+${unpaidNotes.join('+')}`;
+        } else if (unpaidTotal > 0) {
+          unpaidDisplay = `${unpaidTotal} 元`;
+        } else if (unpaidNotes.length > 0) {
+          unpaidDisplay = unpaidNotes.join('+');
+        } else {
+          unpaidDisplay = '0 元';
+        }
+
+        const html = `
+          <div class="goods-list">
+            <div class="goods-item">商品：<strong>${goods}</strong>｜狀態：<strong>${status}</strong></div>
+          </div>
+          <div style="margin-top:10px;">未繳金額：<span class="unpaid">${unpaidDisplay}</span></div>
+        `;
+        resultDiv.innerHTML = html;
       } catch (e) {
         resultDiv.innerHTML = '查詢失敗，請稍後再試';
       }
@@ -506,33 +520,41 @@
         const table = json.table;
         const rows = table.rows;
 
-        const header = table.cols.map(col => col.label);
-        const idxName = header.indexOf('LINE名稱'); // 使用LINE名稱欄位
-        const idxLevel = 8; // I欄位是會員等級 (索引8)
-        const idxDiscount = 9; // J欄位是優惠 (索引9)
-        const idxAmount = 10; // K欄位是月累積金額 (索引10)
-        const idxOrders = 11; // L欄位是月累積單數 (索引11)
-        const idxFirstOrder = 12; // M欄位是第一單幾號 (索引12)
+        // 直接使用欄位索引：A 名稱(0), I 會員等級(8), J 優惠(9), K 月累積金額(10), L 月累積單數(11), M 時間(12)
+        const idxName = 0, idxLevel = 8, idxDiscount = 9, idxAmount = 10, idxOrders = 11, idxTime = 12;
 
-        if (idxName === -1) {
-          resultDiv.innerHTML = '試算表中找不到「LINE名稱」欄位，請確認欄位名稱正確';
-          return;
-        }
-
-        const memberRow = rows.find(row => 
-          row.c[idxName] && row.c[idxName].v && row.c[idxName].v.trim() === name
-        );
-
-        if (!memberRow) {
+        const memberRows = rows.filter(row => row.c[idxName] && row.c[idxName].v && String(row.c[idxName].v).trim() === name);
+        if (memberRows.length === 0) {
           resultDiv.innerHTML = '查無此會員資料，請確認輸入正確';
           return;
         }
 
-        const memberLevel = memberRow.c[idxLevel] ? memberRow.c[idxLevel].v : '';
-        const discount = memberRow.c[idxDiscount] ? memberRow.c[idxDiscount].v : '';
-        const monthlyAmount = memberRow.c[idxAmount] ? memberRow.c[idxAmount].v : '0';
-        const monthlyOrders = memberRow.c[idxOrders] ? memberRow.c[idxOrders].v : '0';
-        const firstOrder = memberRow.c[idxFirstOrder] ? memberRow.c[idxFirstOrder].v : '';
+        // 取 M 欄時間最新一筆
+        const parseTs = (val) => {
+          if (!val) return 0;
+          const s = String(val);
+          const m = s.match(/Date\((\d+),(\d+),(\d+)\)/);
+          if (m) {
+            const y = parseInt(m[1]);
+            const mo = parseInt(m[2]);
+            const d = parseInt(m[3]);
+            return new Date(y, mo, d).getTime();
+          }
+          const t = new Date(s).getTime();
+          return isNaN(t) ? 0 : t;
+        };
+
+        const latestRow = memberRows.reduce((acc, cur) => {
+          const tAcc = acc && acc.c[idxTime] ? parseTs(acc.c[idxTime].v) : 0;
+          const tCur = cur && cur.c[idxTime] ? parseTs(cur.c[idxTime].v) : 0;
+          return tCur >= tAcc ? cur : acc;
+        });
+
+        const memberLevel = latestRow.c[idxLevel] ? latestRow.c[idxLevel].v : '';
+        const discount = latestRow.c[idxDiscount] ? latestRow.c[idxDiscount].v : '';
+        const monthlyAmount = latestRow.c[idxAmount] ? latestRow.c[idxAmount].v : '0';
+        const monthlyOrders = latestRow.c[idxOrders] ? latestRow.c[idxOrders].v : '0';
+        const firstOrder = latestRow.c[idxTime] ? latestRow.c[idxTime].v : '';
 
         let actualLevel = memberLevel;
         if (memberLevel === '基礎會員' || memberLevel === '') {
@@ -645,5 +667,4 @@
   </script>
 </body>
 </html> 
-
 
