@@ -341,7 +341,7 @@
       const linkFee = count * 40; // 連結費用改為40元
       
       if (rmb <= 200) {
-        fee = Math.ceil(rmb * 4.8 + linkFee);
+        fee = Math.ceil(rmb * 4.85 + linkFee);
         feeDetail = `人民幣≤200：<strong>¥${rmb}</strong> × 4.8 + 連結費 <strong>${linkFee}元</strong> = <strong>${fee}元</strong>`;
       } else {
         fee = Math.ceil((rmb * 1.05) * 4.85 + linkFee);
@@ -667,6 +667,7 @@
   </script>
 </body>
 </html> 
+
 
 
 
