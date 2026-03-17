@@ -338,14 +338,14 @@
       
       rmb = ceil(rmb);
       let fee = 0, feeDetail = '';
-      const linkFee = count * 40; // 連結費用改為40元
+      const linkFee = count * 50; // 連結費用改為40元
       
       if (rmb <= 200) {
-        fee = Math.ceil(rmb * 4.95 + linkFee);
-        feeDetail = `人民幣≤200：<strong>¥${rmb}</strong> × 4.8 + 連結費 <strong>${linkFee}元</strong> = <strong>${fee}元</strong>`;
+        fee = Math.ceil(rmb * 5 + linkFee);
+        feeDetail = `人民幣≤200：<strong>¥${rmb}</strong> × 5 + 連結費 <strong>${linkFee}元</strong> = <strong>${fee}元</strong>`;
       } else {
-        fee = Math.ceil((rmb * 1.05) * 4.95 + linkFee);
-        feeDetail = `人民幣>200：((<strong>¥${rmb}</strong> × 1.05) × 4.85) + 連結費 <strong>${linkFee}元</strong> = <strong>${fee}元</strong>`;
+        fee = Math.ceil((rmb * 1.05) * 5.05 + linkFee);
+        feeDetail = `人民幣>200：((<strong>¥${rmb}</strong> × 1.05) × 5.05) + 連結費 <strong>${linkFee}元</strong> = <strong>${fee}元</strong>`;
       }
       
       let intlFee = 0, intlDetail = '';
